@@ -4,8 +4,8 @@ export default {
     cmd: ['twitter', 'twt', 'x', 'xdl'],
     category: 'downloader',
     run: async (m, { sock, text, config }) => {
-        if (!text) return m.adReply('Masukkan URL Twitter/X yang valid!')
-        if (!/twitter.com|x.com/.test(text)) return m.adReply('Link tidak valid!')
+        if (!text) return m.reply('Masukkan URL Twitter/X yang valid!')
+        if (!/twitter.com|x.com/.test(text)) return m.reply('Link tidak valid!')
 
         m.reply('⌛ Sedang mengambil data...')
 

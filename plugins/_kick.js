@@ -4,9 +4,9 @@ export default {
     cmd: ['kick', 'tendang'],
     category: 'group',
     run: async (m, { sock, text, isAdmin, isBotAdmin, config }) => {
-        if (!m.isGroup) return m.adReply('Fitur ini hanya dapat digunakan di dalam grup.')
-        if (!isAdmin) return m.adReply('Hanya admin grup yang dapat menggunakan perintah ini.')
-        if (!isBotAdmin) return m.adReply('Bot harus menjadi admin untuk mengeluarkan member.')
+        if (!m.isGroup) return m.reply('Fitur ini hanya dapat digunakan di dalam grup.')
+        if (!isAdmin) return m.reply('Hanya admin grup yang dapat menggunakan perintah ini.')
+        if (!isBotAdmin) return m.reply('Bot harus menjadi admin untuk mengeluarkan member.')
 
         let targets = []
 
@@ -28,7 +28,7 @@ export default {
             help += `› .kick 62831xxx\n`
             help += `› .kick (reply pesan target)\n\n`
             help += `> *${config.botName}*`
-            return m.adReply(help)
+            return m.reply(help)
         }
 
         const ownerNumbers = config.ownerNumber.map(n => n.replace(/[^0-9]/g, '') + '@s.whatsapp.net')
@@ -48,7 +48,7 @@ export default {
 
             try {
                 await sock.groupParticipantsUpdate(m.from, [jid], 'remove')
-                await m.adReply(`✅ Berhasil mengeluarkan @${jid.split('@')[0]}`, null, null, null, null, false, { mentions: [jid] })
+                await m.reply(`✅ Berhasil mengeluarkan @${jid.split('@')[0]}`, { mentions: [jid] })
             } catch (e) {
                 console.error(e)
                 m.reply(`Gagal mengeluarkan @${jid.split('@')[0]}. Mungkin target sudah tidak di grup.`)

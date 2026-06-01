@@ -18,7 +18,7 @@ export default {
         if (m.body.startsWith('>>')) {
             try {
                 let evalTarget = m.body.slice(2).trim()
-                if (!evalTarget) return m.adReply("Kodenya mana?")
+                if (!evalTarget) return m.reply("Kodenya mana?")
                 
                 let result = await eval(`(async () => {
                     try {
@@ -29,14 +29,14 @@ export default {
                 })()`)
 
                 if (typeof result !== 'string') result = util.inspect(result, { depth: 5 })
-                m.adReply(result)
+                m.reply(result)
             } catch (e) {
-                m.adReply(util.format(e))
+                m.reply(util.format(e))
             }
         } else if (m.body.startsWith('>')) {
             try {
                 let evalTarget = m.body.slice(1).trim()
-                if (!evalTarget) return m.adReply("Kodenya mana?")
+                if (!evalTarget) return m.reply("Kodenya mana?")
                 
                 let result = eval(`(() => {
                     try {
@@ -47,16 +47,16 @@ export default {
                 })()`)
                 
                 if (typeof result !== 'string') result = util.inspect(result, { depth: 5 })
-                m.adReply(result)
+                m.reply(result)
             } catch (e) {
-                m.adReply(util.format(e))
+                m.reply(util.format(e))
             }
         } else if (m.body.startsWith('$')) {
             let execTarget = m.body.slice(1).trim()
-            if (!execTarget) return m.adReply("Perintahnya mana?")
+            if (!execTarget) return m.reply("Perintahnya mana?")
             exec(execTarget, (err, stdout) => {
-                if (err) return m.adReply(util.format(err))
-                if (stdout) m.adReply(stdout.trim())
+                if (err) return m.reply(util.format(err))
+                if (stdout) m.reply(stdout.trim())
             })
         }
     }

@@ -6,7 +6,7 @@ export default {
     run: async (m, { sock, text, config }) => {
         const bet = parseInt(text)
         if (!bet || bet < 1) {
-            return m.adReply('🎰 *JUDI SLOT*\n\nMasukan jumlah taruhan!\nContoh: .judi 100', 'Slot Machine', config.body, config.thumbnail1, config.sourceUrl)
+            return m.reply('🎰 *JUDI SLOT*\n\nMasukan jumlah taruhan!\nContoh: .judi 100')
         }
 
         const fruits = ['🍎', '🍊', '🍇', '🍒', '🍋', '🍉', '⭐', '🔔', '💎']

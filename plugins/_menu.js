@@ -68,14 +68,6 @@ export default {
 
         caption = caption.trim() + `\n\n> *${config.botName}*`
 
-        await m.adReply(
-            caption,
-            config.title,
-            config.body,
-            config.thumbnail2,
-            config.sourceUrl,
-            true, 
-            { mentions: [m.sender] }
-        )
+        await m.reply(caption, { mentions: [m.sender] })
     }
 }

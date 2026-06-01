@@ -95,28 +95,37 @@ const startBot = async () => {
 
     sock.ev.on('group-participants.update', async (anu) => {
         const { id, participants, action } = anu
-        if (!['add', 'remove'].includes(action)) return
 
         try {
             const metadata = await sock.groupMetadata(id)
             await saveMetadata(id, metadata.subject, metadata.desc?.toString(), metadata.participants)
             await syncGroupParticipants(id, metadata.participants)
+        } catch (e) { }
 
-            const settings = await getGroupSettings(id)
-            if (action === 'add' && !settings.welcome) return
-            if (action === 'remove' && !settings.goodbye) return
+        const settings = await getGroupSettings(id)
+        if (action === 'add' && !settings.welcome) return
+        if (action === 'remove' && !settings.goodbye) return
+        if (action !== 'add' && action !== 'remove') return
 
-            const botJid = jidNormalizedUser(sock.user.id)
-            const now = new Date()
-            const time = new Intl.DateTimeFormat('id-ID', { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit' }).format(now)
-            const date = new Intl.DateTimeFormat('id-ID', { timeZone: 'Asia/Jakarta', weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(now)
+        const botJid = jidNormalizedUser(sock.user.id)
+        const now = new Date()
+        const time = new Intl.DateTimeFormat('id-ID', { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit' }).format(now)
+        const date = new Intl.DateTimeFormat('id-ID', { timeZone: 'Asia/Jakarta', weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(now)
 
-            for (let item of participants) {
+        for (let item of participants) {
+            try {
                 let jid = decodeJid(item)
                 if (jid === botJid) continue
 
                 if (jid.endsWith('@lid')) {
-                    const found = metadata.participants.find(p => p.id === jid)
+                    let found = null
+                    try {
+                        const metadata = await sock.groupMetadata(id)
+                        if (metadata) {
+                            found = metadata.participants.find(p => p.id === jid)
+                        }
+                    } catch (e) { }
+
                     if (found && found.phoneNumber) {
                         jid = found.phoneNumber
                     } else {
@@ -128,36 +137,43 @@ const startBot = async () => {
 
                 let dbContact = await getContact(jid)
                 let pushName = (dbContact && dbContact.pushname && dbContact.pushname !== 'null') ? dbContact.pushname : jid.split('@')[0]
-                
+
                 let ppUser
                 try {
-                    ppUser = await Promise.race([
-                        sock.profilePictureUrl(jid, 'image'),
-                        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000))
-                    ]).catch(() => sock.profilePictureUrl(jid, 'preview').catch(() => sock.profilePictureUrl(id, 'image')))
-                } catch {
+                    const fetchPP = (async () => {
+                        try {
+                            return await sock.profilePictureUrl(jid, 'image')
+                        } catch {
+                            return await sock.profilePictureUrl(jid, 'preview')
+                        }
+                    })()
+                    const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 2000))
+                    ppUser = await Promise.race([fetchPP, timeout])
+                } catch (e) {
                     ppUser = config.thumbnail1
                 }
+                if (!ppUser) ppUser = config.thumbnail1
 
                 let text = action === 'add' ? settings.welcomeText : settings.goodbyeText
                 if (text) {
                     text = String(text).replace(/@pushname/g, `@${jid.split('@')[0]}`)
                     text = text.replace(/@nama/g, String(pushName))
-                    text = text.replace(/@gcname/g, String(metadata.subject))
-                    text = text.replace(/@desk/g, String(metadata.desc?.toString() || 'Tidak ada deskripsi'))
+
+                    let groupSubject = 'Grup'
+                    try {
+                        const metadata = await sock.groupMetadata(id)
+                        if (metadata) {
+                            groupSubject = metadata.subject
+                        }
+                    } catch (e) { }
+
+                    text = text.replace(/@gcname/g, String(groupSubject))
                     text = text.replace(/@date/g, String(date))
                     text = text.replace(/@jam/g, String(time))
 
-                    await sock.sendButton(id, {
-                        image: ppUser || config.thumbnail1,
-                        text: text,
-                        footer: config.botName,
-                        buttons: []
-                    }, { mentions:[jid] })
+                    await sock.sendImage(id, ppUser, text, '', { mentions: [jid] })
                 }
-            }
-        } catch (e) {
-            console.error('Error GP Update:', e)
+            } catch (e) { }
         }
     })
 
@@ -165,6 +181,8 @@ const startBot = async () => {
         if (type !== 'notify') return
         const m = await serialize(sock, messages[0])
         if (!m || !m.message) return
+
+        if (m.type === 'protocolMessage' || m.type === 'senderKeyDistributionMessage') return
 
         const time = new Date().toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta' })
         
@@ -192,14 +210,19 @@ const startBot = async () => {
             })
         }
 
-        const cmd = m.body.trim().split(/ +/).shift().toLowerCase()
+        const prefixes = ['.', '/', '#', '!']
+        const prefix = prefixes.find(p => m.body.startsWith(p))
+        if (!prefix) return
+
+        const cmd = m.body.slice(prefix.length).trim().split(/ +/).shift().toLowerCase()
         const plugin = getPlugin(cmd)
         if (plugin) {
             try {
+                const textWithoutCmd = m.body.slice(prefix.length + cmd.length).trim()
                 await plugin.run(m, { 
                     sock, 
                     config, 
-                    text: m.text,
+                    text: textWithoutCmd,
                     jid: m.from,
                     isOwner: m.isOwner,
                     isAdmin: m.isAdmin,

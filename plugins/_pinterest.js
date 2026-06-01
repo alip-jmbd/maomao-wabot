@@ -4,7 +4,7 @@ export default {
     cmd: ['pin', 'pinterest'],
     category: 'tools',
     run: async (m, { sock, text, config }) => {
-        if (!text) return m.adReply('Masukkan query pencarian!\nContoh: .pin kaguya 5')
+        if (!text) return m.reply('Masukkan query pencarian!\nContoh: .pin kaguya 5')
 
         let args = text.split(' ')
         let lastArg = args[args.length - 1]

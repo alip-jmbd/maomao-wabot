@@ -15,7 +15,7 @@ export default {
             animals.forEach((emoji, i) => {
                 help += `${i + 1}. ${emoji}\n`
             })
-            return m.adReply(help)
+            return m.reply(help)
         }
 
         const playerBet = bet - 1
@@ -63,6 +63,6 @@ export default {
             resultText += `❌ Yahh kalah... Pilihanmu ${animals[playerBet]} tertinggal di belakang.`
         }
 
-        return m.adReply(resultText, 'Race Results', config.body, config.thumbnail1, config.sourceUrl, false)
+        return m.reply(resultText)
     }
 }

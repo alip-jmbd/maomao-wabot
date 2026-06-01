@@ -4,7 +4,7 @@ export default {
     cmd: ['spotify', 'play'],
     category: 'downloader',
     run: async (m, { sock, text, config }) => {
-        if (!text) return m.adReply('Masukkan judul lagu atau link Spotify!\nContoh: .play blue seol')
+        if (!text) return m.reply('Masukkan judul lagu atau link Spotify!\nContoh: .play blue seol')
 
         m.reply('⌛ Sedang memproses Spotify...')
 
@@ -12,7 +12,6 @@ export default {
             let trackUrl = text;
             let info;
 
-            // Jika input bukan link, cari dulu gess
             if (!/open\.spotify\.com\/track\//.test(text)) {
                 const search = await spotifySearch(text, 1);
                 if (!search.length) return m.reply('Lagu tidak ditemukan.');
@@ -20,7 +19,6 @@ export default {
                 info = search[0];
             }
 
-            // Ambil data download
             const data = await spotifyDownload(trackUrl);
 
             let caption = `⌗ *Spotify Downloader*\n\n`
@@ -28,7 +26,6 @@ export default {
             caption += `› *Artis:* ${data.artist}\n\n`
             caption += `> *${config.botName}*`
 
-            // Kirim Detail Pake Button (Tanpa tombol)
             await sock.sendButton(m.from, {
                 image: data.cover,
                 text: caption,
@@ -36,7 +33,6 @@ export default {
                 buttons: []
             }, { quoted: m })
 
-            // Kirim Audio sebagai file mp3 rapi
             await sock.sendMessage(m.from, { 
                 audio: { url: data.downloadUrl }, 
                 mimetype: 'audio/mpeg',

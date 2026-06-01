@@ -5,8 +5,8 @@ export default {
     cmd: ['swgc'],
     category: 'tools',
     run: async (m, { sock, isAdmin }) => {
-        if (!m.isGroup) return m.adReply("Khusus di dalam grup!")
-        if (!isAdmin) return m.adReply("Hanya admin grup yang bisa menggunakan perintah ini!")
+        if (!m.isGroup) return m.reply("Khusus di dalam grup!")
+        if (!isAdmin) return m.reply("Hanya admin grup yang bisa menggunakan perintah ini!")
 
         let type = m.quoted ? m.quoted.type : m.type
         let mediaMsg = m.quoted ? m.quoted[type] : m.message[type]
@@ -48,15 +48,15 @@ export default {
                     content.caption = text || undefined
                 }
             } else {
-                if (!text) return m.adReply("Teksnya mana?")
+                if (!text) return m.reply("Teksnya mana?")
                 content.text = text
             }
 
             await sock.sendMessage(m.from, content, { backgroundColor: bgColor })
-            return m.adReply("Status Grup Berhasil Dikirim!")
+            return m.reply("Status Grup Berhasil Dikirim!")
         } catch (e) {
             console.error(e)
-            m.adReply("Terjadi kesalahan.")
+            m.reply("Terjadi kesalahan.")
         }
     }
 }

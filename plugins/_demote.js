@@ -4,9 +4,9 @@ export default {
     cmd: ['demote', 'turunkan'],
     category: 'group',
     run: async (m, { sock, text, isAdmin, isBotAdmin, config }) => {
-        if (!m.isGroup) return m.adReply('Fitur ini hanya dapat digunakan di dalam grup.')
-        if (!isAdmin) return m.adReply('Hanya admin grup yang dapat menggunakan perintah ini.')
-        if (!isBotAdmin) return m.adReply('Bot harus menjadi admin untuk menurunkan jabatan admin.')
+        if (!m.isGroup) return m.reply('Fitur ini hanya dapat digunakan di dalam grup.')
+        if (!isAdmin) return m.reply('Hanya admin grup yang dapat menggunakan perintah ini.')
+        if (!isBotAdmin) return m.reply('Bot harus menjadi admin untuk menurunkan jabatan admin.')
 
         let targets = []
 
@@ -28,7 +28,7 @@ export default {
             help += `› .demote 62831xxx\n`
             help += `› .demote (reply pesan target)\n\n`
             help += `> *${config.botName}*`
-            return m.adReply(help)
+            return m.reply(help)
         }
 
         const ownerNumbers = config.ownerNumber.map(n => n.replace(/[^0-9]/g, '') + '@s.whatsapp.net')
@@ -46,13 +46,13 @@ export default {
                 continue
             }
 
-            try {
-                await sock.groupParticipantsUpdate(m.from, [jid], 'demote')
-                await m.adReply(`✅ Berhasil menurunkan jabatan @${jid.split('@')[0]} menjadi Member.`, null, null, null, null, false, { mentions: [jid] })
-            } catch (e) {
-                console.error(e)
-                m.reply(`Gagal menurunkan jabatan @${jid.split('@')[0]}.`)
-            }
+                    try {
+                        await sock.groupParticipantsUpdate(m.from, [jid], 'demote')
+                        await m.reply(`✅ Berhasil menurunkan jabatan @${jid.split('@')[0]} menjadi Member.`, { mentions: [jid] })
+                    } catch (e) {
+                        console.error(e)
+                        m.reply(`Gagal menurunkan jabatan @${jid.split('@')[0]}.`)
+                    }
         }
     }
 }

@@ -39,10 +39,10 @@ export default {
             } catch (e) {
                 console.error(e)
                 await sock.sendMessage(m.from, { react: { text: '❌', key: m.key } })
-                m.adReply('Gagal membuat stiker.', config.title, 'Error', config.thumbnail1, config.sourceUrl)
+                m.reply('Gagal membuat stiker.')
             }
         } else {
-            m.adReply('Kirim atau reply gambar/video dengan caption *.s*', config.title, 'Sticker Tool', config.thumbnail1, config.sourceUrl)
+            m.reply('Kirim atau reply gambar/video dengan caption *.s*')
         }
     }
 }

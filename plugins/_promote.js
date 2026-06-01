@@ -4,9 +4,9 @@ export default {
     cmd: ['promote', 'jadikanadmin'],
     category: 'group',
     run: async (m, { sock, text, isAdmin, isBotAdmin, config }) => {
-        if (!m.isGroup) return m.adReply('Fitur ini hanya dapat digunakan di dalam grup.')
-        if (!isAdmin) return m.adReply('Hanya admin grup yang dapat menggunakan perintah ini.')
-        if (!isBotAdmin) return m.adReply('Bot harus menjadi admin untuk mempromosikan member.')
+        if (!m.isGroup) return m.reply('Fitur ini hanya dapat digunakan di dalam grup.')
+        if (!isAdmin) return m.reply('Hanya admin grup yang dapat menggunakan perintah ini.')
+        if (!isBotAdmin) return m.reply('Bot harus menjadi admin untuk mempromosikan member.')
 
         let targets = []
 
@@ -28,7 +28,7 @@ export default {
             help += `› .promote 62831xxx\n`
             help += `› .promote (reply pesan target)\n\n`
             help += `> *${config.botName}*`
-            return m.adReply(help)
+            return m.reply(help)
         }
 
         const botJid = jidNormalizedUser(sock.user.id)
@@ -43,7 +43,7 @@ export default {
 
             try {
                 await sock.groupParticipantsUpdate(m.from, [jid], 'promote')
-                await m.adReply(`✅ Berhasil mempromosikan @${jid.split('@')[0]} sebagai Admin.`, null, null, null, null, false, { mentions: [jid] })
+                await m.reply(`✅ Berhasil mempromosikan @${jid.split('@')[0]} sebagai Admin.`, { mentions: [jid] })
             } catch (e) {
                 console.error(e)
                 m.reply(`Gagal mempromosikan @${jid.split('@')[0]}.`)

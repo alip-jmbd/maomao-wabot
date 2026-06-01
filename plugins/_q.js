@@ -6,6 +6,6 @@ export default {
     run: async (m) => {
         let target = m.quoted ? m.quoted : m
         let content = util.inspect(target, { depth: 5, showHidden: false })
-        m.adReply(content)
+        m.reply(content)
     }
 }

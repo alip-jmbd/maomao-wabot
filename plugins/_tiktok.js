@@ -4,15 +4,15 @@ export default {
     cmd: ['tiktok', 'tt', 'ttdl'],
     category: 'downloader',
     run: async (m, { sock, text, config }) => {
-        if (!text) return m.adReply('Masukan URL TikTok yang valid!')
-        if (!/tiktok.com/.test(text)) return m.adReply('Link tidak valid!')
+        if (!text) return m.reply('Masukan URL TikTok yang valid!')
+        if (!/tiktok.com/.test(text)) return m.reply('Link tidak valid!')
 
-        m.adReply('⏳ Sedang memproses, mohon tunggu...')
+        m.reply('⏳ Sedang memproses, mohon tunggu...')
 
         try {
             const data = await ttdown(text)
             
-            if (!data.downloads.length) return m.adReply('Gagal mengambil link download.')
+            if (!data.downloads.length) return m.reply('Gagal mengambil link download.')
 
             const videoUrl = data.downloads.find(v => v.type === 'mp4' || v.label.includes('MP4'))?.url || data.downloads[0].url
             const audioUrl = data.downloads.find(v => v.type === 'mp3' || v.label.includes('MP3'))?.url
@@ -30,7 +30,7 @@ export default {
 
         } catch (e) {
             console.error(e)
-            m.adReply('Terjadi kesalahan saat mengunduh video. Pastikan link benar dan video tidak diprivasi.')
+            m.reply('Terjadi kesalahan saat mengunduh video. Pastikan link benar dan video tidak diprivasi.')
         }
     }
 }
